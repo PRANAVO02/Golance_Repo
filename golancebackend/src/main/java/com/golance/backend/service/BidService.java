@@ -9,8 +9,6 @@ import com.golance.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class BidService {
 
@@ -23,37 +21,24 @@ public class BidService {
     @Autowired
     private UserRepository userRepository;
 
-    public Bid createBid(Long taskId, Long userId, int credits) {
+    // Place a bid
+    public Bid placeBid(Long taskId, Long userId, int credits, String description) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Check if the user already has a bid on this task
-        Bid bid = bidRepository.findByTaskAndUser(task, user)
-                .orElseGet(() -> {
-                    Bid newBid = new Bid();
-                    newBid.setTask(task);
-                    newBid.setUser(user);
-                    newBid.setCreditsBid(0); // start from 0
-                    return newBid;
-                });
+        if (credits > task.getCreditsOffered()) {
+            throw new RuntimeException("Credits cannot exceed task's max credits");
+        }
 
-        // Increment the user's bid
-        bid.setCreditsBid(bid.getCreditsBid() + credits);
-        bidRepository.save(bid);
+        Bid bid = new Bid();
+        bid.setTask(task);
+        bid.setBidder(user);
+        bid.setCredits(credits);
+        bid.setDescription(description);
 
-        // Update total credits offered for the task
-        task.setCreditsOffered(task.getCreditsOffered() + credits);
-        taskRepository.save(task);
-
-        return bid;
-    }
-
-    public List<Bid> getBidsForTask(Long taskId) {
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
-        return bidRepository.findByTask(task);
+        return bidRepository.save(bid);
     }
 }

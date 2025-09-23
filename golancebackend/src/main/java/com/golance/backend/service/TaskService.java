@@ -1,6 +1,9 @@
 package com.golance.backend.service;
 
+import com.golance.backend.model.Bid;
 import com.golance.backend.model.Task;
+import com.golance.backend.model.TaskStatus;
+import com.golance.backend.repository.BidRepository;
 import com.golance.backend.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,6 +13,9 @@ import java.util.List;
 public class TaskService {
     @Autowired
     private TaskRepository taskRepository;
+
+    @Autowired
+    private BidRepository bidRepository;
 
     public Task createTask(Task task) {
         return taskRepository.save(task);
@@ -42,4 +48,21 @@ public class TaskService {
     public List<Task> getTasksByUser(Long userId) {
         return taskRepository.findByPostedBy_Id(userId);
     }
+
+    // Allocate task to a bid
+    public Task allocateTask(Long taskId, Long bidId) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+
+        Bid bid = bidRepository.findById(bidId)
+                .orElseThrow(() -> new RuntimeException("Bid not found"));
+
+        task.setAssignedUser(bid.getBidder());
+        task.setStatus(TaskStatus.ALLOCATED); // make sure you add ALLOCATED in TaskStatus enum
+
+        return taskRepository.save(task);
+    }
+
+
+
 }
