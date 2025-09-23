@@ -193,7 +193,8 @@ export default function TaskPage() {
             <ul>
               {bids.map((bid) => (
                 <li key={bid.id}>
-                  <strong>User:</strong> {bid.user?.username || (bid.userId === user.id ? "You" : `User ${bid.userId}`)},{" "}
+                  {/* <strong>User:</strong> {bid.user?.username || (bid.userId === user.id ? "You" : `User ${bid.userId}`)},{" "} */}
+                  <strong>Bidder:</strong> { bid.bidderName},{" "}
                   <strong>Credits:</strong> {bid.credits},{" "}
                   <strong>Description:</strong> {bid.description}
                 </li>

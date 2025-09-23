@@ -89,7 +89,7 @@ export default function MyTasks() {
     }
   };
 
-  const goToHome = () => navigate("/");
+  const goToHome = () => navigate("/home");
 
   return (
     <div className="container mt-5">
@@ -117,6 +117,14 @@ export default function MyTasks() {
               <td>{task.deadline}</td>
               <td>{task.status}</td>
               <td>
+                 <Button
+                  variant="info"
+                  size="sm"
+                  className="me-2"
+                  onClick={() => navigate(`/tasks/${task.id}/bids`)}
+                >
+                  View Bids
+                </Button>
                 <Button
                   variant="warning"
                   size="sm"
@@ -132,6 +140,8 @@ export default function MyTasks() {
                 >
                   Delete
                 </Button>
+               
+
               </td>
             </tr>
           ))}

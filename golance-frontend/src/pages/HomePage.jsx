@@ -26,7 +26,7 @@ export default function HomePage() {
         <nav className="navbar navbar-expand-lg bg-body-tertiary px-3">
           <div className="container-fluid">
             {/* Left: Logo + Brand */}
-            <Link to="/" className="navbar-brand d-flex align-items-center">
+            <Link to="/home" className="navbar-brand d-flex align-items-center">
               <img
                 src={golanceLogo}
                 alt="golance logo"
@@ -54,7 +54,7 @@ export default function HomePage() {
               {/* Center: Navigation Links */}
               <ul className="navbar-nav mx-auto mb-2 mb-lg-0">
                 <li className="nav-item">
-                  <Link className="nav-link active" to="/">
+                  <Link className="nav-link active" to="/home">
                     Home
                   </Link>
                 </li>
@@ -79,7 +79,7 @@ export default function HomePage() {
               <div className="d-flex">
                 {user ? (
                   <>
-                    <span className="me-3">Welcome, {user.username}</span>
+                    <span className="me-3" >Welcome, {user.username}</span>
                     <button
                       onClick={handleLogout}
                       className="btn btn-outline-danger"
