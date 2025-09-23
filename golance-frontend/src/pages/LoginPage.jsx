@@ -30,7 +30,7 @@ export default function LoginPage() {
       if (data.message === "Login Successful") {
         // Save user in localStorage for later use
         localStorage.setItem("user", JSON.stringify(data));
-        navigate("/"); // redirect to HomePage
+        navigate("/home"); // redirect to HomePage
       } else {
         setError(data.message || "Invalid email or password");
       }

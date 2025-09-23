@@ -20,19 +20,13 @@ export default function MyTasks() {
   });
 
   const navigate = useNavigate();
-
-// Function to handle navigation
-const goToHome = () => {
-  navigate("/"); // redirects to HomePage
-};
-
   const user = JSON.parse(localStorage.getItem("user"));
 
   const fetchTasks = async () => {
     try {
-      const res = await fetch("http://localhost:8080/api/tasks");
+      const res = await fetch(`http://localhost:8080/api/tasks/user/${user.id}`);
       const data = await res.json();
-      setTasks(data.filter((task) => task.postedBy.id === user.id));
+      setTasks(data);
     } catch (err) {
       console.error("Failed to fetch tasks", err);
     }
@@ -42,7 +36,6 @@ const goToHome = () => {
     fetchTasks();
   }, []);
 
-  // Delete handlers
   const handleDeleteClick = (taskId) => {
     setDeleteTaskId(taskId);
     setShowDeleteModal(true);
@@ -63,7 +56,6 @@ const goToHome = () => {
     }
   };
 
-  // Edit handlers
   const handleEditClick = (task) => {
     setEditTask({
       id: task.id,
@@ -97,13 +89,12 @@ const goToHome = () => {
     }
   };
 
+  const goToHome = () => navigate("/");
+
   return (
-    
-    
     <div className="container mt-5">
-      
       <h2 className="mb-4">My Tasks</h2>
-      
+
       <table className="table table-bordered">
         <thead>
           <tr>
@@ -147,94 +138,92 @@ const goToHome = () => {
         </tbody>
       </table>
 
-    {/* Edit Task Modal */}
-<Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
-  <Modal.Header closeButton>
-    <Modal.Title>Edit Task</Modal.Title>
-  </Modal.Header>
-  <Modal.Body>
-    <Form>
-      <Form.Group className="mb-3">
-        <Form.Label>Title</Form.Label>
-        <Form.Control
-          type="text"
-          name="title"
-          value={editTask.title}
-          onChange={handleEditChange}
-        />
-      </Form.Group>
-      <Form.Group className="mb-3">
-        <Form.Label>Description</Form.Label>
-        <Form.Control
-          as="textarea"
-          rows={3}
-          name="description"
-          value={editTask.description}
-          onChange={handleEditChange}
-        />
-      </Form.Group>
-      <Form.Group className="mb-3">
-        <Form.Label>Category</Form.Label>
-        <Form.Control
-          type="text"
-          name="category"
-          value={editTask.category}
-          onChange={handleEditChange}
-        />
-      </Form.Group>
-      <Form.Group className="mb-3">
-        <Form.Label>Credits</Form.Label>
-        <Form.Control
-          type="number"
-          name="creditsOffered"
-          value={editTask.creditsOffered}
-          onChange={handleEditChange}
-        />
-      </Form.Group>
-      <Form.Group className="mb-3">
-        <Form.Label>Deadline</Form.Label>
-        <Form.Control
-          type="date"
-          name="deadline"
-          value={editTask.deadline}
-          onChange={handleEditChange}
-        />
-      </Form.Group>
-      <Form.Group className="mb-3">
-        <Form.Label>Status</Form.Label>
-        <Form.Select
-          name="status"
-          value={editTask.status}
-          onChange={handleEditChange}
-        >
-          <option value="PENDING">PENDING</option>
-          <option value="OPEN">OPEN</option>
-          <option value="ASSIGNED">ASSIGNED</option>
-          <option value="COMPLETED">COMPLETED</option>
-          <option value="CANCELLED">CANCELLED</option>
-        </Form.Select>
-      </Form.Group>
-    </Form>
-  </Modal.Body>
-  <Modal.Footer>
-    <Button variant="secondary" onClick={() => setShowEditModal(false)}>
-      Cancel
-    </Button>
-    <Button variant="success" onClick={saveEdit}>
-      Save
-    </Button>
-  </Modal.Footer>
-</Modal>
-
+      {/* Edit Task Modal */}
+      <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Edit Task</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3">
+              <Form.Label>Title</Form.Label>
+              <Form.Control
+                type="text"
+                name="title"
+                value={editTask.title}
+                onChange={handleEditChange}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Description</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                name="description"
+                value={editTask.description}
+                onChange={handleEditChange}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Category</Form.Label>
+              <Form.Control
+                type="text"
+                name="category"
+                value={editTask.category}
+                onChange={handleEditChange}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Credits Offered</Form.Label>
+              <Form.Control
+                type="number"
+                name="creditsOffered"
+                value={editTask.creditsOffered}
+                onChange={handleEditChange}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Deadline</Form.Label>
+              <Form.Control
+                type="date"
+                name="deadline"
+                value={editTask.deadline}
+                onChange={handleEditChange}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Status</Form.Label>
+              <Form.Select
+                name="status"
+                value={editTask.status}
+                onChange={handleEditChange}
+              >
+                <option value="PENDING">PENDING</option>
+                <option value="OPEN">OPEN</option>
+                <option value="ALLOCATED">ALLOCATED</option>
+                <option value="IN_PROGRESS">IN_PROGRESS</option>
+                <option value="COMPLETED">COMPLETED</option>
+                <option value="CANCELLED">CANCELLED</option>
+              </Form.Select>
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="success" onClick={saveEdit}>
+            Save
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       {/* Delete Confirmation Modal */}
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Delete</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          Are you sure you want to delete this task?
-        </Modal.Body>
+        <Modal.Body>Are you sure you want to delete this task?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
             No
@@ -244,12 +233,12 @@ const goToHome = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-      <div className="mb-4 text-center">
-  <button className="btn btn-primary" onClick={goToHome}>
-    Back to Home
-  </button>
-</div>
 
+      <div className="mb-4 text-center">
+        <Button className="btn btn-primary" onClick={goToHome}>
+          Back to Home
+        </Button>
+      </div>
     </div>
   );
 }
