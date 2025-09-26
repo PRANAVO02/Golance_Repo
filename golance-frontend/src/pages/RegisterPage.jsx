@@ -4,7 +4,14 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ username: "", email: "", password: "" });
+  const [form, setForm] = useState({
+    username: "",
+    email: "",
+    password: "",
+    skills: "",
+    studyingYear: "",
+    department: "",
+  });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -26,7 +33,7 @@ export default function RegisterPage() {
 
       if (!res.ok) throw new Error("Registration failed");
 
-      // Step 2: After successful registration, login immediately
+      // Step 2: Login immediately after registration
       const loginRes = await fetch("http://localhost:8080/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -37,9 +44,10 @@ export default function RegisterPage() {
 
       const data = await loginRes.json();
 
-      if (data.message === "Login Successful") {
+      // Save user and redirect
+      if (data.email) {
         localStorage.setItem("user", JSON.stringify(data));
-        navigate("/"); // redirect to HomePage
+        navigate("/home"); // redirect to HomePage
       } else {
         setError(data.message || "Could not login after registration");
       }
@@ -98,6 +106,46 @@ export default function RegisterPage() {
               onChange={handleChange}
               required
             />
+          </div>
+          <div className="mb-3">
+            <input
+              type="text"
+              name="skills"
+              placeholder="Skills (comma separated)"
+              className="form-control"
+              value={form.skills}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="mb-3">
+            <select
+              name="studyingYear"
+              className="form-select"
+              value={form.studyingYear}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select Year</option>
+              <option value="1st Year">1st Year</option>
+              <option value="2nd Year">2nd Year</option>
+              <option value="3rd Year">3rd Year</option>
+              <option value="4th Year">4th Year</option>
+            </select>
+          </div>
+          <div className="mb-3">
+            <select
+              name="department"
+              className="form-select"
+              value={form.department}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select Department</option>
+              <option value="CSE">CSE</option>
+              <option value="ECE">ECE</option>
+              <option value="EEE">EEE</option>
+              <option value="SWE">SWE</option>
+            </select>
           </div>
           <button
             type="submit"
