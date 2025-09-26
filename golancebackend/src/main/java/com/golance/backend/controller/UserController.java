@@ -1,12 +1,11 @@
 package com.golance.backend.controller;
 
-
-import com.golance.backend.dto.LoginResponse;
 import com.golance.backend.model.User;
 import com.golance.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -17,46 +16,38 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    //registering a new user
+    // 1️⃣ Register a new user
     @PostMapping("/register")
-    public User registerUser(@RequestBody User user){
-        return userService.registerUser(user);
-    }
-
-//    //login user
-//    @PostMapping("/login")
-//    public String loginUser(@RequestBody User loginRequest){
-//        boolean isValid = userService.validateUser(
-//                loginRequest.getEmail(),
-//                loginRequest.getPassword()
-//
-//        );
-//
-//        if(isValid){
-//            return "Login Successful";
-//        }
-//        else{
-//            return "Invalid email or password";
-//        }
-//    }
-@PostMapping("/login")
-public Object loginUser(@RequestBody User loginRequest) {
-    Optional<User> userOpt = userService.findByEmail(loginRequest.getEmail());
-
-    if (userOpt.isPresent()) {
-        User user = userOpt.get();
-        if (user.getPassword().equals(loginRequest.getPassword())) {
-            // return response with user details
-            return new LoginResponse(
-                    user.getId(),
-                    user.getUsername(),
-                    user.getEmail(),
-                    user.getRole(),
-                    "Login Successful"
-            );
+    public Object registerUser(@RequestBody User user) {
+        try {
+            return userService.registerUser(user);
+        } catch (Exception e) {
+            return Map.of("message", "Registration failed: " + e.getMessage());
         }
     }
-    return new LoginResponse(null, null, null, null, "Invalid email or password");
-}
 
+    // 2️⃣ Login user
+    @PostMapping("/login")
+    public Object loginUser(@RequestBody User loginRequest) {
+        Optional<User> userOpt = userService.findByEmail(loginRequest.getEmail());
+
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            if (user.getPassword().equals(loginRequest.getPassword())) {
+                return user; // return full User entity including skills/year/department
+            }
+        }
+        return Map.of("message", "Invalid email or password");
+    }
+
+    // 3️⃣ Get user details by ID
+    @GetMapping("/{id}")
+    public Object getUserById(@PathVariable Long id) {
+        try {
+            User user = userService.getUserById(id);
+            return user; // return full User entity
+        } catch (Exception e) {
+            return Map.of("message", "User not found with id: " + id);
+        }
+    }
 }
