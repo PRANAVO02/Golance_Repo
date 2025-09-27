@@ -24,33 +24,25 @@ export default function RegisterPage() {
     setError("");
 
     try {
-      // Step 1: Register user
-      const res = await fetch("http://localhost:8080/api/users/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+      const registerRes = await fetch(
+        "http://localhost:8080/api/users/register",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        }
+      );
 
-      if (!res.ok) throw new Error("Registration failed");
-
-      // Step 2: Login immediately after registration
-      const loginRes = await fetch("http://localhost:8080/api/users/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: form.email, password: form.password }),
-      });
-
-      if (!loginRes.ok) throw new Error("Login after registration failed");
-
-      const data = await loginRes.json();
-
-      // Save user and redirect
-      if (data.email) {
-        localStorage.setItem("user", JSON.stringify(data));
-        navigate("/home"); // redirect to HomePage
-      } else {
-        setError(data.message || "Could not login after registration");
+      if (!registerRes.ok) {
+        const errData = await registerRes.json();
+        throw new Error(errData?.message || "Registration failed");
       }
+
+      const registeredUser = await registerRes.json();
+
+      // Show success and redirect to login page
+      alert("Registration successful! Please login.");
+      navigate("/login");
     } catch (err) {
       setError(err.message || "Something went wrong");
     } finally {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 export default function ProfilePage() {
   const { id } = useParams(); // get user ID from URL
@@ -7,10 +7,22 @@ export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const [error, setError] = useState("");
 
+  const token = localStorage.getItem("token"); // JWT token
+  const headers = {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${token}`,
+  };
+
   useEffect(() => {
     const fetchUser = async () => {
+      if (!token) {
+        alert("You must be logged in to view profiles.");
+        navigate("/login");
+        return;
+      }
+
       try {
-        const res = await fetch(`http://localhost:8080/api/users/${id}`);
+        const res = await fetch(`http://localhost:8080/api/users/${id}`, { headers });
         if (!res.ok) throw new Error("Failed to fetch user details");
         const data = await res.json();
         setUser(data);
@@ -20,7 +32,7 @@ export default function ProfilePage() {
     };
 
     fetchUser();
-  }, [id]);
+  }, [id, navigate, token]);
 
   const handleBack = () => navigate("/home");
 

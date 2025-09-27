@@ -26,7 +26,7 @@ function App() {
         <Route path="/my-tasks" element={<MyTasks />} />
         <Route path="/tasks" element={<TaskPage />} />
         <Route path="/tasks/:taskId/bids" element={<TaskBids />} />
-        <Route path="/profile/:id" element={<ProfilePage />} />
+        <Route path="/profile/:id" element={<ProfilePage />} /> {/* <- :id is required */}
 
       </Routes>
     </Router>
