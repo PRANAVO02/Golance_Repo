@@ -1,6 +1,6 @@
 <h1>for frontend</h1>
 
-go to file directory 
+Go to the file directory 
 run > npm run dev
 
 open localhost:5173
@@ -8,10 +8,10 @@ open localhost:5173
 <h1>For Backend </h1>
 
 clean maven
- run mian file as java application in eclipse 
+ Run the main file as a Java application in Eclipse 
 
-in intelij just run the file
+In IntelliJ, just run the file
 
 opens localhost:8080
 
-need some changes in the frontend
+Need some changes in the frontend
