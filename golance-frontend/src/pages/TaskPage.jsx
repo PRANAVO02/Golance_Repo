@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function TaskPage() {
   const [tasks, setTasks] = useState([]);
@@ -7,10 +7,11 @@ export default function TaskPage() {
   const [error, setError] = useState("");
   const [selectedTask, setSelectedTask] = useState(null);
   const [bids, setBids] = useState([]);
+  const [activeTab, setActiveTab] = useState("OPEN"); // ✅ Default tab
   const [showBidForm, setShowBidForm] = useState(false);
   const [bidAmount, setBidAmount] = useState("");
   const [bidDescription, setBidDescription] = useState("");
-  const [estimatedDays, setEstimatedDays] = useState(""); // NEW
+  const [estimatedDays, setEstimatedDays] = useState("");
 
   const user = JSON.parse(localStorage.getItem("user"));
   const token = localStorage.getItem("token");
@@ -40,7 +41,10 @@ export default function TaskPage() {
 
   const fetchBids = async (taskId) => {
     try {
-      const res = await fetch(`http://localhost:8080/api/bids/tasks/${taskId}`, { headers });
+      const res = await fetch(
+        `http://localhost:8080/api/bids/tasks/${taskId}`,
+        { headers }
+      );
       if (!res.ok) throw new Error("Failed to fetch bids");
       const data = await res.json();
       setBids(data);
@@ -62,7 +66,8 @@ export default function TaskPage() {
 
   const handleBidSubmit = async (e) => {
     e.preventDefault();
-    if (!bidAmount || !bidDescription || !estimatedDays) return alert("Fill all fields");
+    if (!bidAmount || !bidDescription || !estimatedDays)
+      return alert("Fill all fields");
 
     if (Number(bidAmount) > selectedTask.creditsOffered) {
       return alert(`Bid cannot exceed ${selectedTask.creditsOffered} credits`);
@@ -72,15 +77,18 @@ export default function TaskPage() {
       userId: user.id,
       credits: Number(bidAmount),
       description: bidDescription,
-      estimatedDays: Number(estimatedDays), // NEW
+      estimatedDays: Number(estimatedDays),
     };
 
     try {
-      const res = await fetch(`http://localhost:8080/api/bids/tasks/${selectedTask.id}`, {
-        method: "POST",
-        headers,
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch(
+        `http://localhost:8080/api/bids/tasks/${selectedTask.id}`,
+        {
+          method: "POST",
+          headers,
+          body: JSON.stringify(payload),
+        }
+      );
 
       if (!res.ok) {
         const errText = await res.text();
@@ -91,7 +99,7 @@ export default function TaskPage() {
       setBids((prev) => [...prev, newBid]);
       setBidAmount("");
       setBidDescription("");
-      setEstimatedDays(""); // reset
+      setEstimatedDays("");
       setShowBidForm(false);
       alert("Bid placed successfully!");
     } catch (err) {
@@ -100,6 +108,14 @@ export default function TaskPage() {
     }
   };
 
+  // ✅ Filter tasks based on status
+  const openTasks = tasks.filter(
+    (t) => t.status === "OPEN" && t.postedBy?.id !== user.id
+  );
+  const otherTasks = tasks.filter(
+    (t) => t.status !== "OPEN" && t.postedBy?.id !== user.id
+  );
+
   return (
     <div className="container my-5">
       <h2 className="mb-4">All Tasks</h2>
@@ -107,65 +123,163 @@ export default function TaskPage() {
       {loading && <p>Loading tasks...</p>}
       {error && <div className="alert alert-danger">{error}</div>}
 
-      <div className="row">
-        {tasks.map((task) => (
-          <div key={task.id} className="col-md-4 mb-3">
-            <div className="card h-100">
-              <div className="card-body">
-                <h5 className="card-title">{task.title}</h5>
-                <p><strong>Category:</strong> {task.category}</p>
-                <p><strong>Credits:</strong> {task.creditsOffered}</p>
-                <p><strong>Status:</strong> {task.status}</p>
-                <p><strong>Deadline:</strong> {task.deadline}</p>
-                <p><strong>Posted By:</strong> {task.postedBy?.username || "N/A"}</p>
+      {/* ✅ Tabs for switching */}
+      <ul className="nav nav-tabs mb-3">
+        <li className="nav-item">
+          <button
+            className={`nav-link ${activeTab === "OPEN" ? "active" : ""}`}
+            onClick={() => setActiveTab("OPEN")}
+          >
+            Open Tasks
+          </button>
+        </li>
+        <li className="nav-item">
+          <button
+            className={`nav-link ${activeTab === "OTHER" ? "active" : ""}`}
+            onClick={() => setActiveTab("OTHER")}
+          >
+            Other Tasks
+          </button>
+        </li>
+      </ul>
 
-                <button className="btn btn-primary mt-2" onClick={() => handleViewDetails(task)}>
-                  View Details
-                </button>
+      {/* ✅ Task List */}
+      <div className="row">
+        {(activeTab === "OPEN" ? openTasks : otherTasks).map((task) => {
+          const isOwner = task.postedBy?.id === user.id;
+
+          return (
+            <div key={task.id} className="col-md-4 mb-3">
+              <div className="card h-100">
+                <div className="card-body">
+                  <h5 className="card-title">{task.title}</h5>
+                  <p>
+                    <strong>Category:</strong> {task.category}
+                  </p>
+                  <p>
+                    <strong>Credits:</strong> {task.creditsOffered}
+                  </p>
+                  <p>
+                    <strong>Status:</strong> {task.status}
+                  </p>
+                  <p>
+                    <strong>Deadline:</strong> {task.deadline}
+                  </p>
+                  <p>
+                    <strong>Posted By:</strong>{" "}
+                    {task.postedBy?.username || "N/A"}
+                  </p>
+
+                  <button
+                    className="btn btn-primary mt-2"
+                    onClick={() => handleViewDetails(task)}
+                  >
+                    View Details
+                  </button>
+
+                  {task.status !== "OPEN" && (
+                    <p className="text-danger mt-1">Bidding closed</p>
+                  )}
+                  {isOwner && (
+                    <p className="text-warning mt-1">
+                      You cannot bid on your own task
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
+      {/* ✅ Modal for Task Details */}
       {selectedTask && (
-        <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+        <div
+          className="modal show d-block"
+          tabIndex="-1"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
           <div className="modal-dialog modal-lg modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">{selectedTask.title}</h5>
-                <button type="button" className="btn-close" onClick={() => setSelectedTask(null)}></button>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setSelectedTask(null)}
+                ></button>
               </div>
               <div className="modal-body text-dark">
-                <p><strong>Category:</strong> {selectedTask.category}</p>
-                <p><strong>Description:</strong> {selectedTask.description}</p>
-                <p><strong>Credits:</strong> {selectedTask.creditsOffered}</p>
-                <p><strong>Status:</strong> {selectedTask.status}</p>
-                <p><strong>Deadline:</strong> {selectedTask.deadline}</p>
-                <p><strong>Posted By:</strong> {selectedTask.postedBy?.username || "N/A"}</p>
+                <p>
+                  <strong>Category:</strong> {selectedTask.category}
+                </p>
+                <p>
+                  <strong>Description:</strong> {selectedTask.description}
+                </p>
+                <p>
+                  <strong>Credits:</strong> {selectedTask.creditsOffered}
+                </p>
+                <p>
+                  <strong>Status:</strong> {selectedTask.status}
+                </p>
+                <p>
+                  <strong>Deadline:</strong> {selectedTask.deadline}
+                </p>
+                <p>
+                  <strong>Posted By:</strong>{" "}
+                  {selectedTask.postedBy?.username || "N/A"}
+                </p>
 
-                {!showBidForm && (
-                  <button className="btn btn-success mb-3 mt-2" onClick={() => setShowBidForm(true)}>
-                    Bid
-                  </button>
-                )}
+                {selectedTask.status === "OPEN" &&
+                  selectedTask.postedBy?.id !== user.id &&
+                  !showBidForm && (
+                    <button
+                      className="btn btn-success mb-3 mt-2"
+                      onClick={() => setShowBidForm(true)}
+                    >
+                      Bid
+                    </button>
+                  )}
 
                 {showBidForm && (
                   <form onSubmit={handleBidSubmit} className="mb-3">
                     <div className="mb-2">
                       <label className="form-label">Bid Amount</label>
-                      <input type="number" className="form-control" value={bidAmount} onChange={(e) => setBidAmount(e.target.value)} />
+                      <input
+                        type="number"
+                        className="form-control"
+                        value={bidAmount}
+                        onChange={(e) => setBidAmount(e.target.value)}
+                        max={selectedTask.creditsOffered}
+                      />
                     </div>
                     <div className="mb-2">
                       <label className="form-label">Description</label>
-                      <textarea className="form-control" value={bidDescription} onChange={(e) => setBidDescription(e.target.value)} />
+                      <textarea
+                        className="form-control"
+                        value={bidDescription}
+                        onChange={(e) => setBidDescription(e.target.value)}
+                      />
                     </div>
                     <div className="mb-2">
                       <label className="form-label">Estimated Days</label>
-                      <input type="number" className="form-control" value={estimatedDays} onChange={(e) => setEstimatedDays(e.target.value)} />
+                      <input
+                        type="number"
+                        className="form-control"
+                        value={estimatedDays}
+                        onChange={(e) => setEstimatedDays(e.target.value)}
+                      />
                     </div>
-                    <button type="submit" className="btn btn-primary me-2">Submit Bid</button>
-                    <button type="button" className="btn btn-secondary" onClick={() => setShowBidForm(false)}>Cancel</button>
+                    <button type="submit" className="btn btn-primary me-2">
+                      Submit Bid
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => setShowBidForm(false)}
+                    >
+                      Cancel
+                    </button>
                   </form>
                 )}
 
@@ -179,14 +293,19 @@ export default function TaskPage() {
                         <strong>Bidder:</strong> {bid.bidderName},{" "}
                         <strong>Credits:</strong> {bid.credits},{" "}
                         <strong>Description:</strong> {bid.description},{" "}
-                        <strong>Estimated Days:</strong> {bid.estimatedDays} {/* NEW */}
+                        <strong>Estimated Days:</strong> {bid.estimatedDays}
                       </li>
                     ))}
                   </ul>
                 )}
               </div>
               <div className="modal-footer">
-                <button className="btn btn-secondary" onClick={() => setSelectedTask(null)}>Close</button>
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => setSelectedTask(null)}
+                >
+                  Close
+                </button>
               </div>
             </div>
           </div>

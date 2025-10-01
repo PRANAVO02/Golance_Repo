@@ -14,14 +14,36 @@ export default function RegisterPage() {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [emailError, setEmailError] = useState("");
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const vitEmailRegex = /^[a-z]+(?:\.[a-z]+)?\d{4}@vitstudent\.ac\.in$/;
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+
+    if (name === "email") {
+      if (!vitEmailRegex.test(value)) {
+        setEmailError(
+          "Email must be in format: firstname.lastname2022@vitstudent.ac.in"
+        );
+      } else {
+        setEmailError("");
+      }
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+
+    // Extra check before submission
+    if (!vitEmailRegex.test(form.email)) {
+      setError("Invalid VIT email format");
+      setLoading(false);
+      return;
+    }
 
     try {
       const registerRes = await fetch(
@@ -38,9 +60,8 @@ export default function RegisterPage() {
         throw new Error(errData?.message || "Registration failed");
       }
 
-      const registeredUser = await registerRes.json();
+      await registerRes.json();
 
-      // Show success and redirect to login page
       alert("Registration successful! Please login.");
       navigate("/login");
     } catch (err) {
@@ -66,7 +87,10 @@ export default function RegisterPage() {
         <h2 className="text-center mb-4 text-danger">Register for GoLance</h2>
         {error && <div className="alert alert-danger">{error}</div>}
         <form onSubmit={handleSubmit}>
-          <div className="mb-3">
+          <div className="mb-3 input-group">
+            <span className="input-group-text">
+              <i className="bi bi-person-fill"></i>
+            </span>
             <input
               type="text"
               name="username"
@@ -77,18 +101,27 @@ export default function RegisterPage() {
               required
             />
           </div>
-          <div className="mb-3">
+          <div className="mb-3 input-group">
+            <span className="input-group-text">
+              <i className="bi bi-envelope-fill"></i>
+            </span>
             <input
               type="email"
               name="email"
               placeholder="Email"
-              className="form-control"
+              className={`form-control ${emailError ? "is-invalid" : ""}`}
               value={form.email}
               onChange={handleChange}
               required
             />
+            {emailError && (
+              <div className="invalid-feedback">{emailError}</div>
+            )}
           </div>
-          <div className="mb-3">
+          <div className="mb-3 input-group">
+            <span className="input-group-text">
+              <i className="bi bi-lock-fill"></i>
+            </span>
             <input
               type="password"
               name="password"
@@ -99,7 +132,10 @@ export default function RegisterPage() {
               required
             />
           </div>
-          <div className="mb-3">
+          <div className="mb-3 input-group">
+            <span className="input-group-text">
+              <i className="bi bi-lightbulb-fill"></i>
+            </span>
             <input
               type="text"
               name="skills"
@@ -122,6 +158,7 @@ export default function RegisterPage() {
               <option value="2nd Year">2nd Year</option>
               <option value="3rd Year">3rd Year</option>
               <option value="4th Year">4th Year</option>
+              <option value="4th Year">5th Year</option>
             </select>
           </div>
           <div className="mb-3">
@@ -137,6 +174,8 @@ export default function RegisterPage() {
               <option value="ECE">ECE</option>
               <option value="EEE">EEE</option>
               <option value="SWE">SWE</option>
+              <option value="SWE">IT</option>
+              <option value="SWE">Others</option>
             </select>
           </div>
           <button

@@ -1,6 +1,10 @@
 // src/pages/PostTask.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Card, Form, Button } from "react-bootstrap";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function PostTask() {
   const [task, setTask] = useState({
@@ -8,15 +12,19 @@ export default function PostTask() {
     description: "",
     creditsOffered: "",
     category: "",
-    deadline: "",
+    deadline: null, // store Date object
   });
 
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user")); // logged-in user
-  const token = localStorage.getItem("token"); // JWT token
+  const user = JSON.parse(localStorage.getItem("user"));
+  const token = localStorage.getItem("token");
 
   const handleChange = (e) => {
     setTask({ ...task, [e.target.name]: e.target.value });
+  };
+
+  const handleDateChange = (date) => {
+    setTask({ ...task, deadline: date });
   };
 
   const handleSubmit = async (e) => {
@@ -32,8 +40,8 @@ export default function PostTask() {
       title: task.title,
       description: task.description,
       category: task.category,
-      deadline: task.deadline,
-      status: "PENDING",
+      deadline: task.deadline ? task.deadline.toISOString().split("T")[0] : "", // format YYYY-MM-DD
+      status: "OPEN",
       creditsOffered: parseInt(task.creditsOffered),
       postedById: user.id,
     };
@@ -43,17 +51,17 @@ export default function PostTask() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`, // send JWT token
+          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify(taskData),
       });
 
       if (response.ok) {
-        alert("Task posted successfully!");
+        alert("✅ Task posted successfully!");
         navigate("/my-tasks");
       } else {
         const err = await response.json();
-        alert("Failed to post task: " + (err.message || "Unknown error"));
+        alert("❌ Failed to post task: " + (err.message || "Unknown error"));
       }
     } catch (error) {
       console.error("Error:", error);
@@ -62,72 +70,81 @@ export default function PostTask() {
   };
 
   return (
-    <div className="container mt-5">
-      <h2>Post a Task</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-3">
-          <label>Title</label>
-          <input
-            type="text"
-            className="form-control"
-            name="title"
-            value={task.title}
-            onChange={handleChange}
-            required
-          />
-        </div>
+    <div className="container mt-5 d-flex justify-content-center">
+      <Card className="shadow-lg p-4 w-75">
+        <h2 className="text-center mb-4 text-primary">📌 Post a New Task</h2>
+        <Form onSubmit={handleSubmit}>
+          <Form.Group className="mb-3" controlId="formTitle">
+            <Form.Label>Task Title</Form.Label>
+            <Form.Control
+              type="text"
+              name="title"
+              value={task.title}
+              onChange={handleChange}
+              placeholder="Enter task title"
+              required
+            />
+          </Form.Group>
 
-        <div className="mb-3">
-          <label>Description</label>
-          <textarea
-            className="form-control"
-            name="description"
-            value={task.description}
-            onChange={handleChange}
-            required
-          ></textarea>
-        </div>
+          <Form.Group className="mb-3" controlId="formDescription">
+            <Form.Label>Description</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              name="description"
+              value={task.description}
+              onChange={handleChange}
+              placeholder="Describe the task in detail"
+              required
+            />
+          </Form.Group>
 
-        <div className="mb-3">
-          <label>Credits Offered</label>
-          <input
-            type="number"
-            className="form-control"
-            name="creditsOffered"
-            value={task.creditsOffered}
-            onChange={handleChange}
-            required
-          />
-        </div>
+          <Form.Group className="mb-3" controlId="formCredits">
+            <Form.Label>Credits Offered</Form.Label>
+            <Form.Control
+              type="number"
+              name="creditsOffered"
+              value={task.creditsOffered}
+              onChange={handleChange}
+              placeholder="Enter credits"
+              required
+            />
+          </Form.Group>
 
-        <div className="mb-3">
-          <label>Category</label>
-          <input
-            type="text"
-            className="form-control"
-            name="category"
-            value={task.category}
-            onChange={handleChange}
-            required
-          />
-        </div>
+          <Form.Group className="mb-3" controlId="formCategory">
+            <Form.Label>Category</Form.Label>
+            <Form.Control
+              type="text"
+              name="category"
+              value={task.category}
+              onChange={handleChange}
+              placeholder="e.g. Web Development, Design, Writing"
+              required
+            />
+          </Form.Group>
 
-        <div className="mb-3">
-          <label>Deadline</label>
-          <input
-            type="date"
-            className="form-control"
-            name="deadline"
-            value={task.deadline}
-            onChange={handleChange}
-            required
-          />
-        </div>
+          <Form.Group className="mb-3" controlId="formDeadline">
+            <Form.Label>Deadline</Form.Label>
+            <DatePicker
+              selected={task.deadline}
+              onChange={handleDateChange}
+              dateFormat="yyyy-MM-dd"
+              minDate={new Date()} // disable past dates
+              placeholderText="Select a deadline"
+              className="form-control"
+              required
+              showPopperArrow={false}
+              popperPlacement="bottom"
+            />
+          </Form.Group>
 
-        <button type="submit" className="btn btn-primary">
-          Post Task
-        </button>
-      </form>
+          <div className="text-center">
+            <Button type="submit" variant="primary" className="px-4">
+              🚀 Post Task
+            </Button>
+          </div>
+        </Form>
+      </Card>
     </div>
   );
 }

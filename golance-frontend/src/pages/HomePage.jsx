@@ -1,16 +1,23 @@
 import { Link, useNavigate } from "react-router-dom";
-import golanceLogo from "../assets/Golance_Logo.jpg";
+import golanceLogo from "../assets/GoLance_Logo_Transparent.png";
+
 import { useEffect, useState } from "react";
 
 export default function HomePage() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [theme, setTheme] = useState("dark"); // default theme
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
+
+    // Apply saved theme
+    const savedTheme = localStorage.getItem("theme") || "dark";
+    setTheme(savedTheme);
+    document.documentElement.setAttribute("data-theme", savedTheme);
   }, []);
 
   const handleLogout = () => {
@@ -18,6 +25,13 @@ export default function HomePage() {
     setUser(null);
     navigate("/login");
   };
+
+  const toggleTheme = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
+    document.documentElement.setAttribute("data-theme", newTheme);
+  };  
 
   return (
     <div>
@@ -30,7 +44,7 @@ export default function HomePage() {
               <img
                 src={golanceLogo}
                 alt="golance logo"
-                height="40"
+                height="60"
                 className="me-2"
               />
               <span className="fw-bold fs-5">GoLance</span>
@@ -74,41 +88,51 @@ export default function HomePage() {
                 </li>
               </ul>
             </div>
-
-            {/* Profile / Sign In */}
-            <div className="d-flex align-items-center">
-              {user ? (
-                <div className="dropdown">
-                  <button
-                    className="btn btn-outline-secondary dropdown-toggle"
-                    type="button"
-                    id="profileDropdown"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    {user.username}
-                  </button>
-                  <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                    <li>
-                      <Link className="dropdown-item" to={`/profile/${user.id}`}>
-                        View Profile
-                      </Link>
-                    </li>
-                    <li>
-                      <button className="dropdown-item" onClick={handleLogout}>
-                        Logout
-                      </button>
-                    </li>
-                  </ul>
-                </div>
-              ) : (
-                <Link to="/login" className="btn btn-primary px-4">
-                  Sign In
-                </Link>
-              )}
-            </div>
           </div>
         </nav>
+
+        {/* Profile & Theme Toggle */}
+        <div className="container d-flex justify-content-end align-items-center mt-2">
+          <button
+            className="btn btn-outline-secondary me-3"
+            onClick={toggleTheme}
+          >
+            {theme === "dark" ? "🌞 Light Mode" : "🌙 Dark Mode"}
+          </button>
+
+          {user ? (
+            <div className="dropdown">
+              <button
+                className="btn btn-outline-secondary dropdown-toggle"
+                type="button"
+                id="profileDropdown"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                {user.username}
+              </button>
+              <ul
+                className="dropdown-menu dropdown-menu-end"
+                aria-labelledby="profileDropdown"
+              >
+                <li>
+                  <Link className="dropdown-item" to={`/profile/${user.id}`}>
+                    View Profile
+                  </Link>
+                </li>
+                <li>
+                  <button className="dropdown-item" onClick={handleLogout}>
+                    Logout
+                  </button>
+                </li>
+              </ul>
+            </div>
+          ) : (
+            <Link to="/login" className="btn btn-primary px-4">
+              Sign In
+            </Link>
+          )}
+        </div>
       </header>
 
       {/* Main Section */}
