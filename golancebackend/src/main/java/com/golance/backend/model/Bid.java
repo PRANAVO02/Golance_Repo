@@ -23,6 +23,8 @@ public class Bid {
 
     private int estimatedDays;
 
+    @Enumerated(EnumType.STRING)
+    private BidStatus bidStatus = BidStatus.OPEN; // default OPEN
 
     private String description;
 
@@ -47,7 +49,13 @@ public class Bid {
         this.estimatedDays = estimatedDays;
     }
 
+    public BidStatus getBidStatus() {
+        return bidStatus;
+    }
 
+    public void setBidStatus(BidStatus bidStatus) {
+        this.bidStatus = bidStatus;
+    }
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }

@@ -18,6 +18,7 @@ public class TaskService {
     private BidRepository bidRepository;
 
     public Task createTask(Task task) {
+        task.setStatus(TaskStatus.OPEN);
         return taskRepository.save(task);
     }
 
@@ -63,6 +64,10 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
+    // Get all tasks assigned to a specific user
+    public List<Task> getAssignedTasks(Long userId) {
+        return taskRepository.findByAssignedUser_Id(userId);
+    }
 
 
 }

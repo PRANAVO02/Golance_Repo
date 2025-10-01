@@ -2,9 +2,11 @@ package com.golance.backend.controller;
 
 import com.golance.backend.dto.TaskRequestDto;
 //import com.golance.backend.dto.TaskResponseDto;
+import com.golance.backend.dto.StatusUpdateDto;
 import com.golance.backend.model.Task;
 import com.golance.backend.model.TaskStatus;
 import com.golance.backend.model.User;
+import com.golance.backend.repository.TaskRepository;
 import com.golance.backend.service.TaskService;
 import com.golance.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,8 @@ public class TaskController {
 
     @Autowired
     private UserService userService; // For fetching postedBy & assignedUser
+
+
 
     // CREATE
     @PostMapping
@@ -90,6 +94,29 @@ public class TaskController {
     public List<Task> getTasksByUser(@PathVariable Long userId) {
         return taskService.getTasksByUser(userId);
     }
+
+    @GetMapping("/user/{userId}/assigned-tasks")
+    public List<Task> getAssignedTasks(@PathVariable Long userId) {
+        return taskService.getAssignedTasks(userId);
+    }
+
+
+
+    @PutMapping("/{id}/status")
+    public Task updateTaskStatus(@PathVariable Long id, @RequestBody StatusUpdateDto dto) {
+        Task task = taskService.getTaskById(id);
+
+        try {
+            TaskStatus newStatus = TaskStatus.valueOf(dto.getStatus().toUpperCase());
+            task.setStatus(newStatus);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid status: " + dto.getStatus());
+        }
+
+        return taskService.updateTask(id, task);
+    }
+
+
 
 
 

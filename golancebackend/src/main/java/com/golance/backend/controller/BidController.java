@@ -1,6 +1,6 @@
 package com.golance.backend.controller;
 
-import com.golance.backend.dto.BidRequest;
+import com.golance.backend.dto.BidRequestDto;
 import com.golance.backend.dto.BidResponseDto;
 import com.golance.backend.model.Bid;
 import com.golance.backend.model.Task;
@@ -31,13 +31,13 @@ public class BidController {
 
     // ------------------ PLACE BID ------------------
     @PostMapping("/tasks/{taskId}")
-    public BidResponseDto placeBid(@PathVariable Long taskId, @RequestBody BidRequest bidRequest) {
+    public BidResponseDto placeBid(@PathVariable Long taskId, @RequestBody BidRequestDto bidRequestDto) {
         Bid bid = bidService.placeBid(
                 taskId,
-                bidRequest.getUserId(),
-                bidRequest.getCredits(),
-                bidRequest.getDescription(),
-                bidRequest.getEstimatedDays() // pass estimated days
+                bidRequestDto.getUserId(),
+                bidRequestDto.getCredits(),
+                bidRequestDto.getDescription(),
+                bidRequestDto.getEstimatedDays() // pass estimated days
         );
         return mapToResponse(bid);
     }
@@ -62,12 +62,12 @@ public class BidController {
 
     // ------------------ UPDATE BID ------------------
     @PutMapping("/{id}")
-    public ResponseEntity<BidResponseDto> updateBid(@PathVariable Long id, @RequestBody BidRequest bidRequest) {
+    public ResponseEntity<BidResponseDto> updateBid(@PathVariable Long id, @RequestBody BidRequestDto bidRequestDto) {
         Optional<Bid> optionalBid = bidRepository.findById(id);
         if (optionalBid.isPresent()) {
             Bid bid = optionalBid.get();
-            bid.setCredits(bidRequest.getCredits());
-            bid.setDescription(bidRequest.getDescription());
+            bid.setCredits(bidRequestDto.getCredits());
+            bid.setDescription(bidRequestDto.getDescription());
             bidRepository.save(bid);
             return ResponseEntity.ok(mapToResponse(bid));
         } else {
@@ -89,9 +89,15 @@ public class BidController {
 
     // ------------------ ALLOCATE TASK TO BID ------------------
     @PostMapping("/tasks/{taskId}/allocate/{bidId}")
-    public Task allocateTask(@PathVariable Long taskId, @PathVariable Long bidId) {
-        return taskService.allocateTask(taskId, bidId);
+    public ResponseEntity<?> allocateTask(@PathVariable Long taskId, @PathVariable Long bidId) {
+        try {
+            Task task = taskService.allocateTask(taskId, bidId);
+            return ResponseEntity.ok(task);
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
     }
+
     // ------------------ GET ALL BIDS BY USER ------------------
     @GetMapping("/user/{userId}")
     public List<BidResponseDto> getBidsByUser(@PathVariable Long userId) {
@@ -108,12 +114,20 @@ public class BidController {
         dto.setId(bid.getId());
         dto.setCredits(bid.getCredits());
         dto.setDescription(bid.getDescription());
-        dto.setEstimatedDays(bid.getEstimatedDays()); // <--- NEW
+        dto.setEstimatedDays(bid.getEstimatedDays());
         if (bid.getBidder() != null) {
             dto.setBidderId(bid.getBidder().getId());
             dto.setBidderName(bid.getBidder().getUsername());
         }
+        if (bid.getTask() != null) {
+            dto.setTaskId(bid.getTask().getId());
+            dto.setTaskTitle(bid.getTask().getTitle());
+        }
+        if (bid.getBidStatus() != null) {
+            dto.setBidStatus(bid.getBidStatus().name());
+        }
         return dto;
     }
+
 
 }

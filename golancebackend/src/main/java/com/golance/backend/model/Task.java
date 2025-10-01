@@ -22,7 +22,7 @@ public class Task {
     private LocalDate deadline;
 
     @Enumerated(EnumType.STRING)
-    private TaskStatus status = TaskStatus.PENDING;
+    private TaskStatus status = TaskStatus.OPEN;
 
     private int creditsOffered;
 

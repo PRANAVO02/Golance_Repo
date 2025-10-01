@@ -1,6 +1,7 @@
 package com.golance.backend.service;
 
 import com.golance.backend.model.Bid;
+import com.golance.backend.model.BidStatus;
 import com.golance.backend.model.Task;
 import com.golance.backend.model.User;
 import com.golance.backend.repository.BidRepository;
@@ -39,7 +40,7 @@ public class BidService {
         bid.setCredits(credits);
         bid.setDescription(description);
         bid.setEstimatedDays(estimatedDays); // <--- NEW FIELD
-
+        bid.setBidStatus(BidStatus.OPEN);
         return bidRepository.save(bid);
     }
 
