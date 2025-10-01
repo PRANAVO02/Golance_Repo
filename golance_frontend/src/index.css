@@ -1,0 +1,84 @@
+:root {
+  --bg-color: #E7F2EF;          /* Light background */
+  --card-bg: #A1C2BD;          /* Cards / elevated UI */
+  --primary-btn-bg: #708993;   /* Buttons */
+  --primary-btn-text: #ffffff; /* Button text */
+  --text-color: #19183B;       /* Main text color */
+  --link-color: #708993;       /* Links */
+  --link-hover: #19183B;       /* Link hover */
+  --input-bg: #E7F2EF;         /* Input background */
+  --input-text: #19183B;       /* Input text */
+  --input-border: #708993;     /* Input border */
+}
+
+/* General body */
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Buttons */
+button, .btn {
+  border: none;
+  border-radius: 8px;
+  padding: 0.6em 1.2em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.btn-primary {
+  background-color: var(--primary-btn-bg);
+  color: var(--primary-btn-text);
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+}
+
+/* Cards */
+.card {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Inputs */
+input, textarea, select {
+  background-color: var(--input-bg);
+  color: var(--input-text);
+  border: 1px solid var(--input-border);
+  border-radius: 6px;
+  padding: 0.5em;
+  width: 100%;
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--input-border);
+}
+
+/* Links */
+a {
+  color: var(--link-color);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--link-hover);
+}
+
+/* Navbar */
+.navbar, .bg-body-tertiary {
+  background-color: var(--primary-btn-bg) !important;
+  color: var(--primary-btn-text);
+}
+
+.navbar .nav-link {
+  color: var(--primary-btn-text) !important;
+}
+.navbar .nav-link:hover {
+  color: #E7F2EF !important;
+}
