@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { ListGroup, Card } from "react-bootstrap";
 
 export default function TaskPage() {
   const [tasks, setTasks] = useState([]);
@@ -18,7 +19,7 @@ export default function TaskPage() {
 
   const headers = {
     "Content-Type": "application/json",
-    "Authorization": `Bearer ${token}`,
+    Authorization: `Bearer ${token}`,
   };
 
   if (!user || !token) {
@@ -287,16 +288,29 @@ export default function TaskPage() {
                 {bids.length === 0 ? (
                   <p>No bids yet.</p>
                 ) : (
-                  <ul>
+                  <ListGroup>
                     {bids.map((bid) => (
-                      <li key={bid.id}>
-                        <strong>Bidder:</strong> {bid.bidderName},{" "}
-                        <strong>Credits:</strong> {bid.credits},{" "}
-                        <strong>Description:</strong> {bid.description},{" "}
-                        <strong>Estimated Days:</strong> {bid.estimatedDays}
-                      </li>
+                      <ListGroup.Item key={bid.id} className="mb-2">
+                        <Card>
+                          <Card.Body>
+                            <p>
+                              <strong>Bidder:</strong> {bid.bidderName}
+                            </p>
+                            <p>
+                              <strong>Credits:</strong> {bid.credits}
+                            </p>
+                            <p>
+                              <strong>Description:</strong> {bid.description}
+                            </p>
+                            <p>
+                              <strong>Estimated Days:</strong>{" "}
+                              {bid.estimatedDays}
+                            </p>
+                          </Card.Body>
+                        </Card>
+                      </ListGroup.Item>
                     ))}
-                  </ul>
+                  </ListGroup>
                 )}
               </div>
               <div className="modal-footer">

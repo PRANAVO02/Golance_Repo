@@ -51,7 +51,7 @@ export default function LoginPage() {
       className="d-flex justify-content-center align-items-center"
       style={{
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)",
+        background: "linear-gradient(135deg, #4d90d3ff 0%, #E7F2EF 100%)",
         padding: "20px",
       }}
     >

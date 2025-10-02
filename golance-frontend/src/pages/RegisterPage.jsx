@@ -76,7 +76,7 @@ export default function RegisterPage() {
       className="d-flex justify-content-center align-items-center"
       style={{
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #ff9966 0%, #ff5e62 100%)",
+        background: "linear-gradient(135deg, #c87c56ff 0%, #b1b547ff 100%)",
         padding: "20px",
       }}
     >
@@ -180,7 +180,7 @@ export default function RegisterPage() {
           </div>
           <button
             type="submit"
-            className="btn btn-danger w-100"
+            className="btn btn-secondary w-100"
             disabled={loading}
           >
             {loading ? "Registering..." : "Register"}
