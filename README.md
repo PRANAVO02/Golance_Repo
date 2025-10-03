@@ -1,7 +1,7 @@
 <h1><i>Frontend</i></h1>
 
 Go to the file directory 
-run > npm run dev
+run ><b> npm run dev</b>
 
 open localhost:5173
 
