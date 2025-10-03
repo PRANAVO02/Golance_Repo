@@ -1,4 +1,4 @@
-<h1>for frontend</h1>
+<h1><i>For frontend</i></h1>
 
 Go to the file directory 
 run > npm run dev
